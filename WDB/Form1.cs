@@ -30,7 +30,7 @@ namespace WDB
 
             string startupPath = System.IO.Path.GetFullPath(".\\");
             string NameDir = startupPath.Substring(0, startupPath.Length - 10);
-            MessageBox.Show(NameDir);
+            //MessageBox.Show(NameDir);
 
             //string connection = @"Data Source=.\SQLEXPRESS;AttachDbFilename=C:\Users\1\Desktop\DB\WDB\WDB\Database1.mdf;Integrated Security=True;User Instance=True";
             string connection = @"Data Source=.\SQLEXPRESS;AttachDbFilename="+NameDir+"Database1.mdf;Integrated Security=True;User Instance=True";

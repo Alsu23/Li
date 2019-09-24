@@ -24,3 +24,16 @@ C:\Users\1\Desktop\DB\WDB\WDB\obj\x86\Debug\WDB.Form3.resources
 C:\Users\1\Desktop\DB\WDB\WDB\obj\x86\Debug\WDB.Properties.Resources.resources
 C:\Users\1\Desktop\DB\WDB\WDB\obj\x86\Debug\WDB.csproj.GenerateResource.Cache
 C:\Users\1\Desktop\DB\WDB\WDB\obj\x86\Debug\WDB.csprojAssemblyReference.cache
+C:\Users\1\Desktop\WDB\WDB\bin\Debug\Database1.mdf
+C:\Users\1\Desktop\WDB\WDB\bin\Debug\Database1_log.ldf
+C:\Users\1\Desktop\WDB\WDB\bin\Debug\WDB.exe.config
+C:\Users\1\Desktop\WDB\WDB\bin\Debug\WDB.exe
+C:\Users\1\Desktop\WDB\WDB\bin\Debug\WDB.pdb
+C:\Users\1\Desktop\WDB\WDB\obj\x86\Debug\WDB.csprojAssemblyReference.cache
+C:\Users\1\Desktop\WDB\WDB\obj\x86\Debug\WDB.Form1.resources
+C:\Users\1\Desktop\WDB\WDB\obj\x86\Debug\WDB.Form2.resources
+C:\Users\1\Desktop\WDB\WDB\obj\x86\Debug\WDB.Form3.resources
+C:\Users\1\Desktop\WDB\WDB\obj\x86\Debug\WDB.Properties.Resources.resources
+C:\Users\1\Desktop\WDB\WDB\obj\x86\Debug\WDB.csproj.GenerateResource.cache
+C:\Users\1\Desktop\WDB\WDB\obj\x86\Debug\WDB.exe
+C:\Users\1\Desktop\WDB\WDB\obj\x86\Debug\WDB.pdb
