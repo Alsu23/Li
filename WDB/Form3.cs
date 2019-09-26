@@ -12,8 +12,8 @@ namespace WDB
 {
     public partial class Form3 : Form
     {
-        SqlConnection sqlConnection;
-
+        OperationsWithDB OperDB = new OperationsWithDB();
+        SqlConnection sqlConnection1=new SqlConnection();
         public Form3()
         {
             InitializeComponent();
@@ -24,52 +24,25 @@ namespace WDB
             Hide();
             Form1 f1 = new Form1();
             f1.ShowDialog();
-
-            if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)
-                sqlConnection.Close();
-
+            OperDB.CloseConnection(sqlConnection1);
             Close();
         }
 
-
-        private void Form3_Load(object sender, EventArgs e)
+        public void Form3_Load(object sender, EventArgs e)
         {
-            string startupPath = System.IO.Path.GetFullPath(".\\");
-            string NameDir = startupPath.Substring(0, startupPath.Length - 10);
-            //MessageBox.Show(NameDir);
+            sqlConnection1=OperDB.ConnectionWithDB();
 
-            //string connection = @"Data Source=.\SQLEXPRESS;AttachDbFilename=C:\Users\1\Desktop\DB\WDB\WDB\Database1.mdf;Integrated Security=True;User Instance=True";
-            string connection = @"Data Source=.\SQLEXPRESS;AttachDbFilename=" + NameDir + "Database1.mdf;Integrated Security=True;User Instance=True";
-            
-            sqlConnection = new SqlConnection(connection);
-            sqlConnection.Open();
+            List<Exam> ExList = new List<Exam>();
 
-            SqlDataReader sqlReader = null;
+            ExList = OperDB.CreateExList(sqlConnection1);
 
-            SqlCommand command = new SqlCommand("SELECT * FROM [Exam]", sqlConnection);
-
-          //  try
-           // {
-                sqlReader = command.ExecuteReader();
-                while (sqlReader.Read())
-                {
-                    listBox1.Items.Add(Convert.ToString(sqlReader["id"]) + "   " + Convert.ToString(sqlReader["name"]) + "   " + Convert.ToString(sqlReader["date"]));
-                }
-          //  }
-          //  catch
-          //  {
-           // }
-           // finally
-           // {
-                if (sqlReader != null)
-                    sqlReader.Close();
-           // }
+            foreach (Exam ex in ExList)
+                listBox1.Items.Add(ex.Id + " " + ex.Name + " " + ex.Date);
         }
 
         private void Form3_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)
-                sqlConnection.Close();
+            OperDB.CloseConnection(sqlConnection1);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -80,44 +53,32 @@ namespace WDB
             if (!string.IsNullOrEmpty(textBox1.Text) && !string.IsNullOrWhiteSpace(textBox1.Text)
                 && !string.IsNullOrEmpty(textBox2.Text) && !string.IsNullOrWhiteSpace(textBox2.Text))
             {
-                SqlCommand commandIn = new SqlCommand("INSERT INTO [Exam] (ID, name, date) VALUES(@ID, @name, @date)", sqlConnection);
-                commandIn.Parameters.AddWithValue("ID", Convert.ToInt16(textBox1.Text));
-                commandIn.Parameters.AddWithValue("name", textBox2.Text);
-                commandIn.Parameters.AddWithValue("date", Convert.ToDateTime(dateTimePicker1.Text));
-                commandIn.ExecuteNonQuery();
+
+                Exam newEx = new Exam();
+                newEx.Id = Convert.ToInt16(textBox1.Text);
+                newEx.Name = Convert.ToString(textBox2.Text);
+                newEx.Date = Convert.ToDateTime(dateTimePicker1.Text);
+
+                OperDB.AddEx(newEx, sqlConnection1);
 
                 textBox1.Text = "";
                 textBox2.Text = "";
 
+                List<Exam> ExList = new List<Exam>();
+
+                ExList=OperDB.CreateExList(sqlConnection1);
+
                 listBox1.Items.Clear();
-                SqlDataReader sqlReader = null;
-
-                SqlCommand command = new SqlCommand("SELECT * FROM [Exam]", sqlConnection);
-
-             //   try
-              //  {
-                    sqlReader = command.ExecuteReader();
-                    while (sqlReader.Read())
-                    {
-                        listBox1.Items.Add(Convert.ToString(sqlReader["id"]) + "   " + Convert.ToString(sqlReader["name"]) + "   " + Convert.ToDateTime(sqlReader["date"]));
-                    }
-              //  }
-              //  catch
-              //  {
-              //  }
-               // finally
-               // {
-                    if (sqlReader != null)
-                        sqlReader.Close();
-              //  }
+                foreach (Exam ex in ExList)
+                    listBox1.Items.Add(ex.Id + " " + ex.Name + " " + ex.Date);
             }
             else
             {
                 label8.Visible = true;
                 label8.Text = "Все поля должны быть заполнены";
             }
-
         }
+
 
         private void button3_Click(object sender, EventArgs e)
         {
@@ -127,36 +88,24 @@ namespace WDB
             if (!string.IsNullOrEmpty(textBox3.Text) && !string.IsNullOrWhiteSpace(textBox3.Text)
                 && !string.IsNullOrEmpty(textBox4.Text) && !string.IsNullOrWhiteSpace(textBox4.Text))
             {
-                SqlCommand commandUp = new SqlCommand("UPDATE [Exam] SET [name]=@name, [date]=@date WHERE [ID]=@ID", sqlConnection);
-                commandUp.Parameters.AddWithValue("ID", Convert.ToInt16(textBox3.Text));
-                commandUp.Parameters.AddWithValue("name", textBox4.Text);
-                commandUp.Parameters.AddWithValue("date", Convert.ToDateTime(dateTimePicker2.Text));
-                commandUp.ExecuteNonQuery();
+                Exam updateExam = new Exam();
 
+                updateExam.Id = Convert.ToInt16(textBox3.Text);
+                updateExam.Name = Convert.ToString(textBox4.Text);
+                updateExam.Date = Convert.ToDateTime(dateTimePicker2.Text);
+
+               // OperDB.ConnectionWithDB();
+                OperDB.UpdateEx(updateExam, sqlConnection1);
                 textBox3.Text = "";
                 textBox4.Text = "";
+                OperDB.CreateExList(sqlConnection1);
+                List<Exam> ExList = new List<Exam>();
+
+                ExList = OperDB.CreateExList(sqlConnection1);
 
                 listBox1.Items.Clear();
-                SqlDataReader sqlReader = null;
-
-                SqlCommand command = new SqlCommand("SELECT * FROM [Exam]", sqlConnection);
-
-               // try
-               // {
-                    sqlReader = command.ExecuteReader();
-                    while (sqlReader.Read())
-                    {
-                        listBox1.Items.Add(Convert.ToString(sqlReader["id"]) + "   " + Convert.ToString(sqlReader["name"]) + "   " + Convert.ToString(sqlReader["date"]));
-                    }
-              //  }
-              //  catch
-              //  {
-              //  }
-              //  finally
-               // {
-                    if (sqlReader != null)
-                        sqlReader.Close();
-               // }
+                foreach (Exam ex in ExList)
+                    listBox1.Items.Add(ex.Id + " " + ex.Name + " " + ex.Date);
 
             }
             else
@@ -167,6 +116,7 @@ namespace WDB
 
         }
 
+
         private void button4_Click(object sender, EventArgs e)
         {
 
@@ -175,32 +125,17 @@ namespace WDB
 
             if (!string.IsNullOrEmpty(textBox5.Text) && !string.IsNullOrWhiteSpace(textBox5.Text))
             {
-                SqlCommand commandDel = new SqlCommand("DELETE FROM [Exam] WHERE [ID]=@ID", sqlConnection);
-                commandDel.Parameters.AddWithValue("ID", textBox5.Text);
-                commandDel.ExecuteNonQuery();
+               // OperDB.ConnectionWithDB();
+                OperDB.DellEx(textBox5.Text, sqlConnection1);
                 textBox5.Text = "";
+                OperDB.CreateExList(sqlConnection1);
+
+                List<Exam> ExList = new List<Exam>();
+                ExList = OperDB.CreateExList(sqlConnection1);
+
                 listBox1.Items.Clear();
-                SqlDataReader sqlReader = null;
-
-                SqlCommand command = new SqlCommand("SELECT * FROM [Exam]", sqlConnection);
-
-                //try
-              //  {
-                    sqlReader = command.ExecuteReader();
-                    while (sqlReader.Read())
-                    {
-                        listBox1.Items.Add(Convert.ToString(sqlReader["id"]) + "   " + Convert.ToString(sqlReader["name"]) + "   " + Convert.ToString(sqlReader["date"]));
-                    }
-              // }
-              //  catch
-              //  {
-              //  }
-             //   finally
-              //  {
-                    if (sqlReader != null)
-                        sqlReader.Close();
-              //  }
-
+                foreach (Exam ex in ExList)
+                    listBox1.Items.Add(ex.Id + " " + ex.Name + " " + ex.Date);
             }
             else
             {

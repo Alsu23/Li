@@ -12,7 +12,8 @@ namespace WDB
 {
     public partial class Form2 : Form
     {
-        SqlConnection sqlConnection;
+        OperationsWithDB OperDB = new OperationsWithDB();
+        SqlConnection sqlConnection1 = new SqlConnection();
 
         public Form2()
         {
@@ -23,18 +24,14 @@ namespace WDB
         {
             Hide();
             Form1 f1 = new Form1();
+            OperDB.CloseConnection(sqlConnection1);
             f1.ShowDialog();
-
-            if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)
-                sqlConnection.Close();
-
             Close();
         }
 
         private void Form2_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)
-                sqlConnection.Close();
+            OperDB.CloseConnection(sqlConnection1);
         }
 
         private void Form2_Load(object sender, EventArgs e)
@@ -42,43 +39,25 @@ namespace WDB
             DateTime dateToday = new DateTime();
             dateToday=DateTime.Today;
 
-            string startupPath = System.IO.Path.GetFullPath(".\\");
-            string NameDir = startupPath.Substring(0, startupPath.Length - 10);
-            //MessageBox.Show(NameDir);
-            //string connection = @"Data Source=.\SQLEXPRESS;AttachDbFilename=C:\Users\1\Desktop\DB\WDB\WDB\Database1.mdf;Integrated Security=True;User Instance=True";
-            string connection = @"Data Source=.\SQLEXPRESS;AttachDbFilename=" + NameDir + "Database1.mdf;Integrated Security=True;User Instance=True";
-            
-            sqlConnection = new SqlConnection(connection);
-            sqlConnection.Open();
+            sqlConnection1 = OperDB.ConnectionWithDB();
 
-            SqlDataReader sqlReader1 = null;
+            List<Exam> ExList = new List<Exam>();
 
-            SqlCommand command = new SqlCommand("SELECT * FROM [Exam]", sqlConnection);
+            ExList = OperDB.CreateExList(sqlConnection1);
 
-            //try
-            //{
-                sqlReader1 = command.ExecuteReader();
-                while (sqlReader1.Read())
-                {
-                    TimeSpan difference = Convert.ToDateTime(sqlReader1["date"]) - dateToday;
-                    int days = (int)Math.Ceiling(difference.TotalDays);
+            foreach (Exam ex in ExList)
+            {
+                TimeSpan difference = ex.Date - dateToday;
+                int days = (int)Math.Ceiling(difference.TotalDays);
 
-                    if (Convert.ToDateTime(sqlReader1["date"])==dateToday)
-                        listBox1.Items.Add(Convert.ToString(sqlReader1["id"]) + "   " + Convert.ToString(sqlReader1["name"]) + "   " + Convert.ToString(sqlReader1["date"]));
-                    if (days<=7)
-                        listBox2.Items.Add(Convert.ToString(sqlReader1["id"]) + "   " + Convert.ToString(sqlReader1["name"]) + "   " + Convert.ToString(sqlReader1["date"]));
-                    if (days <= 30)
-                        listBox3.Items.Add(Convert.ToString(sqlReader1["id"]) + "   " + Convert.ToString(sqlReader1["name"]) + "   " + Convert.ToString(sqlReader1["date"]));
-                }
-           // }
-            //catch
-            //{
-            //}
-            //finally
-            //{
-                if (sqlReader1 != null)
-                    sqlReader1.Close();
-            //}
+                if(ex.Date==dateToday)
+                    listBox1.Items.Add(ex.Id + " " + ex.Name + " " + ex.Date);
+                if(days <= 7)
+                    listBox2.Items.Add(ex.Id + " " + ex.Name + " " + ex.Date);
+                if (days <= 30)
+                    listBox3.Items.Add(ex.Id + " " + ex.Name + " " + ex.Date);
+            }
+
         }
     }
 }

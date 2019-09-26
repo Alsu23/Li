@@ -12,7 +12,8 @@ namespace WDB
 {
     public partial class Form1 : Form
     {
-        SqlConnection sqlConnection;
+        OperationsWithDB OperDB = new OperationsWithDB();
+        SqlConnection sqlConnection1 = new SqlConnection();
 
         public Form1()
         {
@@ -23,28 +24,20 @@ namespace WDB
         private void button1_Click(object sender, EventArgs e)
         {
             string rolest;
-            //int k=2;
-           // Hide();
+            Form2 f1 = new Form2();
             Form2 f2 = new Form2();
             Form3 f3 = new Form3();
 
-            string startupPath = System.IO.Path.GetFullPath(".\\");
-            string NameDir = startupPath.Substring(0, startupPath.Length - 10);
-            MessageBox.Show(NameDir);
+            sqlConnection1 = OperDB.ConnectionWithDB();
 
-            //string connection = @"Data Source=.\SQLEXPRESS;AttachDbFilename=C:\Users\1\Desktop\DB\WDB\WDB\Database1.mdf;Integrated Security=True;User Instance=True";
-            string connection = @"Data Source=.\SQLEXPRESS;AttachDbFilename="+NameDir+"Database1.mdf;Integrated Security=True;User Instance=True";
-            sqlConnection = new SqlConnection(connection);
-            sqlConnection.Open();
-
-            M:
+        M:
             if (label3.Visible)
                 label3.Visible = false;
 
             if (!string.IsNullOrEmpty(textBox1.Text) && !string.IsNullOrWhiteSpace(textBox1.Text)
                 && !string.IsNullOrEmpty(textBox2.Text) && !string.IsNullOrWhiteSpace(textBox2.Text))
             {
-                SqlCommand command = new SqlCommand("SELECT [User].[role] FROM [Autho] JOIN [User] ON [Autho].[user_id] = [User].[id] WHERE [User].[id] =  ( Select [Autho].[user_id] FROM [Autho] WHERE [Autho].[login]=@login AND [Autho].[password]=@password) ", sqlConnection);
+                SqlCommand command = new SqlCommand("SELECT [User].[role] FROM [Autho] JOIN [User] ON [Autho].[user_id] = [User].[id] WHERE [User].[id] =  ( Select [Autho].[user_id] FROM [Autho] WHERE [Autho].[login]=@login AND [Autho].[password]=@password) ", sqlConnection1);
                 command.Parameters.AddWithValue("login", textBox1.Text);
                 command.Parameters.AddWithValue("password", textBox2.Text);
 
@@ -54,16 +47,26 @@ namespace WDB
                 textBox2.Text = "";
 
                 if (rolest == "student")
+                {
+                    OperDB.CloseConnection(sqlConnection1);
+                    Hide();
+                    f1.Close();
                     f2.ShowDialog();
+                }
                 if (rolest == "teacher")
+                {
+                    OperDB.CloseConnection(sqlConnection1);
+                    Hide();
+                    f1.Close();
                     f3.ShowDialog();
-                if (rolest == "")
+                }
+                if (rolest != "student" && rolest != "teacher")
+                {
+                    label3.Visible = true;
+                    label3.Text = "Ошибка! Статус пользователя не определен";
                     goto M;
-
-                if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)
-                    sqlConnection.Close();
-                Hide();
-                Close();
+                }
+               Close();
             }
             else
             {
@@ -80,8 +83,7 @@ namespace WDB
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (sqlConnection != null && sqlConnection.State != ConnectionState.Closed)
-                sqlConnection.Close();
+            OperDB.CloseConnection(sqlConnection1);
         }
     }
 }
